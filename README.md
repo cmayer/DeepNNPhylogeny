@@ -26,20 +26,41 @@ cp quartet-pattern-counter-v1.1 /pathway/DeepNNPhylogeny-main/
 ```
 
 ## Neural networks training 
-Quick start with default parameters. 
+Quick start with the default parameters. 
 For model prediction training run:
 ```
 python3 ModelPredictorTraining.py -sequence_type DNA
 ```
 for nucleotide sequences
 or 
-python3 ModelPredictorTraining.py -sequence_type DNA
+```
+python3 ModelPredictorTraining.py -sequence_type AA
+```
 for amino acid sequences 
 
-python3 TopologyPredictorTraining.py
+For model topology training run:
+```
+python3 TopologyPredictorTraining.py  -sequence_type * -substitution_model **
+```
+where * is DNA or AA, and <br />
+** is 'JC','K2P','F81','F84','HKY','GTR' - nucleotide substitution models <br />
+** is 'JTT','LG','WAG_OLD','WAG','WAG_STAR','DAY' - amino acid substitution models
 
 To see all available parameters, their description and usage, run: 
 ```
 python3 ModelPredictorTraining.py --help
 python3 TopologyPredictorTraining.py --help
 ```
+## Trained neural networks usage 
+
+
+It is possible to run both neural networks sequentially in the same program. <br />
+First predict the substitution model, and then 
+predict the tree topology based on the predicted substitution model. 
+```
+./ModelPred_TopPred.sh  -s * -n ** -a *** 
+```
+Where * is DNA or AA <br />
+** is a name of the substitution model neural network predictor folder  <br />
+*** is a name of the multiplealignments file <br />
+After substituion model prediction it will ask you for an input. You should enter the name of the topology prediction. 
