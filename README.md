@@ -53,7 +53,23 @@ python3 TopologyPredictorTraining.py --help
 ```
 ## Trained neural networks usage 
 
-
+To use the trained substitution neural network run: 
+```
+python3 ModelPredictorLoaded.py -sequence_type * -NN_name ** -alignment_file ***
+```
+where * DNA or AA, and <br />
+** is a name of the substitution model neural network predictor folder  <br />
+*** is a name of the multiplealignments file <br />
+For trained topology neural network run: 
+```
+python3 TopologyPredictorLoaded.py -sequence_type * -NN_name ** -alignment_file *** -substitution_model ****
+```
+where * DNA or AA, and <br />
+** is a name of the substitution model neural network predictor folder  <br />
+*** is a name of the multiplealignments file <br />
+**** is 'JC','K2P','F81','F84','HKY','GTR' - nucleotide substitution models <br />
+**** is 'JTT','LG','WAG_OLD','WAG','WAG_STAR','DAY' - amino acid substitution models <br />
+<br />
 It is possible to run both neural networks sequentially in the same program. <br />
 First predict the substitution model, and then 
 predict the tree topology based on the predicted substitution model. 
