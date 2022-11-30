@@ -1,7 +1,7 @@
 # DeepNNPhylogeny
 A Deep Neural Networks for phylogenetic tree reonstructions.
 
-## Setup
++## Setup
 ```
 conda create --name name_of_the_conda_environment python=3.9
 conda activate name_of_the_conda_environment
@@ -15,7 +15,7 @@ conda install -c conda-forge kerastuner
 
 conda install -c conda-forge tensorflow-hub
 
-## Make the programs executable 
++## Make the programs executable 
 
 unzip DeepNNPhylogeny-main.zip
 cd DeepNNPhylogeny-main/
