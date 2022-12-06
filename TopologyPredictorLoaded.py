@@ -9,13 +9,11 @@ import numpy as np
 from   sklearn.naive_bayes import GaussianNB
 import tensorflow as tf
 import random
-import time
 import math
-#import autokeras as ak
+
 import sys
 import argparse
 from numpy import argmax
-#import keras_tuner as kt
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV, train_test_split
@@ -36,9 +34,6 @@ parser.add_argument('-NN_name',type=str, help="Compulsory argument. Enter the na
 parser.add_argument('-alignment_file',type=str, help="Compulsory argument. Enter the name of the multiplealignment file.",required=True)
 
 args = parser.parse_args()
-
-
-mode_grid_search = 1
 
 python_random_seed = 13
 
@@ -77,9 +72,10 @@ elif args.sequence_type == 'AA':
 subprocess.run([command], shell=True)
 frequency_array = np.load('/dev/shm/out.npy')
 frequency_array = np.reshape(frequency_array,(1,-1))
-freq_ar = sc.fit_transform(frequency_array)
-prediction = model.predict(freq_ar)
+#freq_ar = sc.fit_transform(frequency_array)
+prediction = model.predict(frequency_array)
 x = argmax(prediction)
+print(prediction)
 y = x.item()
 tree = tree_topology(y,args.substitution_model)
 tree = Phylo.read(StringIO(tree), 'newick')

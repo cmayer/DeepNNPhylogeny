@@ -6,16 +6,11 @@ import subprocess
 import os
 import itertools
 import numpy as np
-from   sklearn.naive_bayes import GaussianNB
 import tensorflow as tf
 import random
-import time
 import math
-#import autokeras as ak
 import sys
 import argparse
-
-#import keras_tuner as kt
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV, train_test_split
@@ -26,36 +21,26 @@ from tensorboard.plugins.hparams import api as hp
 # Argparse arguments
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-sequence_type', type=str, default='DNA', required=False)
-parser.add_argument('-neural_network', type=str, default='b1', required=False)
-parser.add_argument('-seqlen', type=int, default=100000, required=False)
-parser.add_argument('-seqnum', type=int, default=100000, required=False)
-parser.add_argument('-epochs', type=int, default=500, required=False)
-parser.add_argument('-predict_mode', type=int, default=0, required=False)
-parser.add_argument('-predict_seqlen', type=int, default=30000, required=False)
-parser.add_argument('-predict_seqnum', type=int, default=1000, required=False)
-parser.add_argument('-info', type=int, required=False)
+parser.add_argument('-sequence_type', type=str, default='DNA',
+                    help='Compulsory argument. Nucleotide or Amino acids data. Enter DNA for nucleotide sequences. Enter AA for amino acid sequences.', required=True)
+parser.add_argument('-neural_network', type=str, default='b1', choices=['b1','b2','b3','b10','u','cu','cud'],
+                    help='Optional argument. Which neural network should be trained. Default: b1', required=False)
+parser.add_argument('-seqlen', type=int, default=None,
+                    help='Optional argument.The length of the training sequences. Default for DNA: 100000\tDefault for amino acids: 1000000',required=False)
+parser.add_argument('-seqnum', type=int, default=None,
+                    help='Optional argument. The number of sequences used for training. Actual number is multiplied by 30 for DNA and by 24 for amino acids. Default for DNA: 30000(x30)\tDefault for amino acids: 500(x24)', required=False)
+parser.add_argument('-epochs', type=int, default=500,
+                    help='Optional argument. The number of epochs is a hyperparameter that defines the number times that the learning algorithm will work through the entire training dataset. Default: 500', required=False)
+parser.add_argument('-predict_mode', type=int, default=0,
+                    help='Optional argument. Type of predicted sequences either normal internal branches(0) or short internal branches(1). Default: 0',required=False)
+parser.add_argument('-predict_seqlen', type=int, default=10000,
+                    help='Optional argument. Optional argument. The length of the prediction sequences. Default:10000', required=False)
+parser.add_argument('-predict_seqnum', type=int, default=1000,
+                    help='Optional argument. The number of the prediction sequences. Default: 1000', required=False)
+
 
 args = parser.parse_args()
 
-if args.info == 1:
-    print('Welcome to program that predicts substitution models!')
-    print('USAGE: python3 ModelPredictorTraining.py [-sequence-type <string>] [-neural-network <string>] \n [-sequences-length <integer>], [-reps <integer>] [-EPOCHS <integer>]')
-    print('Optional parameters: ')
-    print('-sequence_type :\tNucleotide or Amino acids data. Enter DNA for nucleotide sequences. Enter AA for amino acid sequences. Default: DNA ')
-    print('-neural_network:\tDefault: b1 ')
-    print('List of the available neural networks: b1, b2, b3, b10, u, cu, cud')
-    print('-seqlen :\tThe length of the training sequences. Default: 100000')
-    print('-seqnum :\tThe number of sequences used for training. Actual number is multiplied by 4 for amino acids and by 5 for nucleotide sequences. Default: 100000')
-    print('-epochs :\tThe number of epochs is a hyperparameter that defines the number times that the learning algorithm will work through the entire training dataset. Default: 500 ')
-    print('-predict_seqlen :\tThe length of the prediction sequences. Default: 30000 ')
-    print('-predict_seqnum :\tThe number of the prediction sequences. Default: 1000 ')
-    print('-predict_mode :\tType of predicted sequences either normal internal branches(0) or short internal branches(1). Default: 0')
-    print('List of the available nucleotide substitution models: JC,K2P,F81,HKY,GTR')
-    print('List of the available amino acids substitution models: JTT, LG, WAG, DAY')
-
-    print('-info:\tDisplays usage information and exit')
-    sys.exit(0)
 
 python_random_seed = 13
 
@@ -71,14 +56,39 @@ tmpdir = os.getcwd() + "/"
 runID = str(os.getpid()*random.randint(1,100000))
 
 ## Switches:
-predict_mode = args.predict_mode ## 0: normal, 1: short internal branches,
+predict_mode = args.predict_mode ## 0: normal, 1: short internal branches
 random.seed(python_random_seed)
 
 #global variables:
+if (args.sequence_type == 'DNA' and args.seqlen == None and args.seqnum == None):
+    global_seqlen = 100000
+    global_replicates = 30000
+    global_replicates_short_internalbranch = 30000
+elif (args.sequence_type == 'AA' and args.seqlen == None and args.seqnum == None):
+    global_seqlen = 1000000
+    global_replicates = 500
+    global_replicates_short_internalbranch = 500
+elif (args.sequence_type == 'DNA' and args.seqlen == None):
+    global_seqlen = 100000
+    global_replicates = args.seqnum
+    global_replicates_short_internalbranch = args.seqnum
+elif (args.sequence_type == 'AA' and args.seqlen == None):
+    global_seqlen = 1000000
+    global_replicates = args.seqnum
+    global_replicates_short_internalbranch = args.seqnum
+elif (args.sequence_type == 'DNA' and args.seqnum == None):
+    global_seqlen = args.seqlen
+    global_replicates = 30000
+    global_replicates_short_internalbranch = 30000
+elif (args.sequence_type == 'AA' and args.seqnum == None):
+    global_seqlen = args.seqlen
+    global_replicates = 500
+    global_replicates_short_internalbranch = 500
+else:
+    global_seqlen = args.seqlen
+    global_replicates = args.seqnum
+    global_replicates_short_internalbranch = args.seqnum
 
-global_seqlen = args.seqlen
-global_replicates = args.seqnum
-global_replicates_short_internalbranch = args.seqnum
 prediction_replicates = args.predict_seqnum
 global_predict_seqlen = args.predict_seqlen
 
@@ -164,7 +174,7 @@ HPARAMS = [
 ]
 
 
-### Evaluation routines: (moved here in Test2):
+### Evaluation routines:
 def highest_likelihood (predictions):
     topo = []
     if args.sequence_type == 'DNA':
@@ -181,17 +191,13 @@ def highest_likelihood (predictions):
                 topo.append('GTR')
     if args.sequence_type == 'AA':
         for prediction in predictions:
-            if prediction[0] > prediction[1] and prediction[0] > prediction[2] and prediction[0] > prediction[3] and \
-                    prediction[0] > prediction[4]:
+            if prediction[0] > prediction[1] and prediction[0] > prediction[2] and prediction[0] > prediction[3] :
                 topo.append('JTT')
-            if prediction[1] > prediction[0] and prediction[1] > prediction[2] and prediction[1] > prediction[3] and \
-                    prediction[1] > prediction[4]:
+            if prediction[1] > prediction[0] and prediction[1] > prediction[2] and prediction[1] > prediction[3] :
                 topo.append('LG')
-            if prediction[2] > prediction[0] and prediction[2] > prediction[1] and prediction[2] > prediction[3] and \
-                    prediction[2] > prediction[4]:
+            if prediction[2] > prediction[0] and prediction[2] > prediction[1] and prediction[2] > prediction[3] :
                 topo.append('WAG')
-            if prediction[4] > prediction[0] and prediction[4] > prediction[1] and prediction[4] > prediction[2] and \
-                    prediction[4] > prediction[3]:
+            if prediction[3] > prediction[0] and prediction[3] > prediction[1] and prediction[3] > prediction[2] :
                 topo.append('DAY')
 
     return topo
@@ -204,7 +210,7 @@ def count_evo_mod_by_likelihood(predictions):
         return [topo.count('JTT')/len(topo), topo.count('LG')/len(topo), topo.count('WAG')/len(topo), topo.count('DAY')/len(topo)]
 
 
-def print_highest_likelihood_evaluation(model, d0, d1, d2,d3,d4):
+def print_highest_likelihood_evaluation(model, d0, d1, d2,d3,d4=None):
     pred0 = model.predict(d0)
     pred1 = model.predict(d1)
     pred2 = model.predict(d2)
@@ -610,7 +616,7 @@ else:
 
         print('Freq_shape: ', frequency_array.shape)
         evo_mod_array = np.array(evo_mod_list)
-        evo_mod_array = np.reshape(evo_mod_array,(5*total_replicates,1))
+        evo_mod_array = np.reshape(evo_mod_array,(4*total_replicates,1))
         print('Evo_mod_shape', evo_mod_array.shape)
 
         np.save(frequency_simulations_filename, frequency_array)
@@ -633,11 +639,18 @@ temporary_WAG = np.empty((prediction_replicates, 160000))
 temporary_DAY = np.empty((prediction_replicates, 160000))
 
 
-# time before simulate data
-timeBeforeSimulateData = time.time()
-
 python_random_seed += 1
 random.seed(python_random_seed)
+
+temporary_JC_filename = " "
+temporary_K2P_filename = " "
+temporary_F81_filename = " "
+temporary_HKY_filename = " "
+temporary_GTR_filename = " "
+temporary_JTT_filename = " "
+temporary_LG_filename = " "
+temporary_WAG_filename = " "
+temporary_DAY_filename = " "
 
 if predict_mode == 0:
     if args.sequence_type == 'DNA' :
@@ -773,7 +786,7 @@ elif args.sequence_type == 'AA' :
 sys.stdout.flush()
 
 
-if os.path.isfile(temporary_JC_filename):
+if os.path.isfile(temporary_JC_filename or temporary_JTT_filename):
     if args.sequence_type == 'DNA' :
         temporary_JC = np.load(temporary_JC_filename,allow_pickle=True)
         temporary_K2P = np.load(temporary_K2P_filename,allow_pickle=True)
