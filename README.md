@@ -16,8 +16,8 @@ unzip DeepNNPhylogeny-main.zip
 cd DeepNNPhylogeny-main/
 chmod u+x ModelPred_TopPred.sh
 cd quartet-pattern-counter-v1.1_src/
-chmod u+x compile.sh
-./compile.sh
+make
+# If make is not installed, type: chmod u+x compile.sh; ./compile.sh
 cp quartet-pattern-counter-v1.1 /pathway/DeepNNPhylogeny-main/
 ```
 
