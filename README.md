@@ -54,11 +54,11 @@ for amino acid sequences.
 
 In order to train a neural network for topology prediction run:
 ```
-python3 TopologyPredictorTraining.py  -sequence_type * -substitution_model **
+python3 TopologyPredictorTraining.py  -sequence_type (*) -substitution_model (**)
 ```
-where * is DNA or AA, and <br />
-** is 'JC','K2P','F81','F84','HKY','GTR' - nucleotide substitution models <br />
-** is 'JTT','LG','WAG_OLD','WAG','WAG_STAR','DAY' - amino acid substitution models
+where (*) is DNA or AA, and <br />
+(**) is 'JC','K2P','F81','F84','HKY','GTR' - nucleotide substitution models <br />
+(**) is 'JTT','LG','WAG_OLD','WAG','WAG_STAR','DAY' - amino acid substitution models
 
 To see all available parameters, their description and usage, run: 
 ```
