@@ -1,11 +1,11 @@
 # DeepNNPhylogeny
-In this project we developed Deep Neural Networks for phylogenetic tree reconstructions. Currently it is limited to quartet trees. On quartet trees it performs in most cases as good as the maximum likelihood method, which means that it is not significantly better or worse than maximum likelyhood.
-In very few scenarios the neural network is significantly inferior than the maximum likelihood method, but the differences are so small that we think that neural networks and training can be improved such that both methods perform equally good.<br>
+In this project we developed Deep Neural Networks for phylogenetic tree reconstruction and evolutionary model selection. Currently the networks are limited to quartet trees. On quartet trees the neural network classifiers perform in most cases as good as the maximum likelihood method, which means that it is not significantly better or worse than maximum likelihood.
+In very few scenarios the neural network is marginally but significantly inferior to the maximum likelihood method, but we think that neural networks and training can be improved such that both methods perform equally good.<br>
 
 This repository contains the software for training und using neural networks for the following tasks:
 - model prediction for nucleotide alignments
-- topology prediction for nucleotide alignments
 - model prediction for amino acid alignments
+- topology prediction for nucleotide alignments
 - topology prediction for amino acid alignments
 
 ## Installing the required machine learning libraries using the Anaconda package manager:
@@ -16,10 +16,14 @@ conda activate name_of_the_conda_environment
 ```
 
 ## On Linux and Mac OS X the DeepNNPhylogeny software can be installed as follows:
-```
+
 - Download the DeepNNPhylogeny archive or clone the github repository locally.
 - If you downloaded the archive: type on the command line:
+```
 unzip DeepNNPhylogeny-main.zip
+```
+Next compile the quartet-pattern-counter-v1.1 program:
+```
 cd DeepNNPhylogeny-main/
 chmod u+x ModelPred_TopPred.sh
 cd quartet-pattern-counter-v1.1_src/
@@ -41,12 +45,12 @@ In order to train a neural network for model prediction run:
 ```
 python3 ModelPredictorTraining.py -sequence_type DNA
 ```
-for nucleotide sequences
+for nucleotide sequences,
 or 
 ```
 python3 ModelPredictorTraining.py -sequence_type AA
 ```
-for amino acid sequences 
+for amino acid sequences. 
 
 In order to train a neural network for topology prediction run:
 ```
@@ -61,6 +65,10 @@ To see all available parameters, their description and usage, run:
 python3 ModelPredictorTraining.py --help
 python3 TopologyPredictorTraining.py --help
 ```
+
+Simulating amino acid data sets takes much longer than simulating nucleotide data sets.
+For a large number of amino acid replicates, we recommend to use multiprocessing library and to conduct the training on a computer with a large number of core. A program to conduct the training on a large number of cores can be found in folder multiprocessing" folder.
+
 
 ## Topology and evolutionary model predictions/classifications:
 
