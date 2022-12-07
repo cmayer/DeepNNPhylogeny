@@ -1,22 +1,17 @@
 # DeepNNPhylogeny
-A Deep Neural Networks for phylogenetic tree reonstructions.
+A Deep Neural Networks for phylogenetic tree reonstructions. Currently it is limited to quartet trees. On quartet trees it performs in most cases as good as the maximum likelihood method.
 
 ## Setup
 Conda environment installation 
 ```
-conda create --name name_of_the_conda_environment python=3.9
+conda create --name name_of_the_conda_environment python tensorflow -c anaconda scikit-learn
 conda activate name_of_the_conda_environment
-conda install tensorflow
-conda install sklearn
-conda install -c anaconda scikit-learn 
-conda install matplotlib pandas (optional)
-conda install -c anaconda tensorflow-datasets 
-conda install -c conda-forge kerastuner 
-conda install -c conda-forge tensorflow-hub
 ```
 
-## Make the programs executable 
+## On Linux and Mac OS X the programs can be installed as follows:
 ```
+- Download the DeepNNPhylogeny archive or clone the github repository locally.
+- If you downloaded the archive: type on the command line: 
 unzip DeepNNPhylogeny-main.zip
 cd DeepNNPhylogeny-main/
 chmod u+x ModelPred_TopPred.sh
@@ -25,9 +20,16 @@ cd quartet-pattern-counter-v1.1/
 cp quartet-pattern-counter-v1.1 /pathway/DeepNNPhylogeny-main/
 ```
 
-## Neural networks training 
-Quick start with the default parameters. 
-For model prediction training run:
+Topology and model predictions/classifications require the quartet-pattern-counter to be in your system path or in the directory you run the python programs in.
+(Needs to be verified.)
+
+## Pretrained neural networks can be downloaded on Dryad. You can train your own neural networks as follows: 
+Quick start with the default parameters.
+
+Training neural networks is done by simulating a large number of data sets and using the pattern frequency vectors together with the known topology
+to train a neural network to classify the topology or the model of sequence evolution. Simulations are conducted with the software [PolyMoSim avaiable on github](https://github.com/cmayer/PolyMoSim). PolyMoSim has to be installed and must be avaiable in the system path in order to run training tasks. The PolyMoSim software is not required if you only want to predict/classify models or topologies.
+
+In order to train a neural network for model prediction run:
 ```
 python3 ModelPredictorTraining.py -sequence_type DNA
 ```
@@ -38,7 +40,7 @@ python3 ModelPredictorTraining.py -sequence_type AA
 ```
 for amino acid sequences 
 
-For model topology training run:
+In order to train a neural network for topology prediction run:
 ```
 python3 TopologyPredictorTraining.py  -sequence_type * -substitution_model **
 ```
@@ -51,9 +53,12 @@ To see all available parameters, their description and usage, run:
 python3 ModelPredictorTraining.py --help
 python3 TopologyPredictorTraining.py --help
 ```
-## Trained neural networks usage 
+## Predicting models or topologies for user specified alignemtns using pretrained models: 
 
 To use the trained substitution neural network run: 
+
+Download pre-trained neural networks from [xxx](https://www.dryad.com) and
+
 ```
 python3 ModelPredictorLoaded.py -sequence_type * -NN_name ** -alignment_file ***
 ```
