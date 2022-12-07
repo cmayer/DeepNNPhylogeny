@@ -1,5 +1,6 @@
 # DeepNNPhylogeny
-In this project we develop Deep Neural Networks for phylogenetic tree reconstructions. Currently it is limited to quartet trees. On quartet trees it performs in most cases as good as the maximum likelihood method.
+In this project we developed Deep Neural Networks for phylogenetic tree reconstructions. Currently it is limited to quartet trees. On quartet trees it performs in most cases as good as the maximum likelihood method, which means that it is not significantly better or worse than maximum likelyhood.
+In very few scenarios the neural network is significantly inferior than the maximum likelihood method, but the differences are so small that we think that neural networks and training can be improved such that both methods perform equally good.<br>
 
 This repository contains the software for training und using neural networks for the following tasks:
 - model prediction for nucleotide alignments
@@ -7,14 +8,14 @@ This repository contains the software for training und using neural networks for
 - model prediction for amino acid alignments
 - topology prediction for amino acid alignments
 
-## Installing required software using the Anaconda package manager:
-First create a conda environment for your tensorflow module: 
+## Installing the required machine learning libraries using the Anaconda package manager:
+It is recommended to create a conda environment for your tensorflow module: 
 ```
 conda create --name name_of_the_conda_environment python tensorflow scikit-learn
 conda activate name_of_the_conda_environment
 ```
 
-## On Linux and Mac OS X the programs can be installed as follows:
+## On Linux and Mac OS X the DeepNNPhylogeny software can be installed as follows:
 ```
 - Download the DeepNNPhylogeny archive or clone the github repository locally.
 - If you downloaded the archive: type on the command line:
@@ -27,11 +28,11 @@ make
 cp quartet-pattern-counter-v1.1 /pathway/DeepNNPhylogeny-main/
 ```
 
-Topology and model predictions/classifications require the quartet-pattern-counter to be in your system path or in the directory you run the python programs in.
-(Needs to be verified.)
+## Training your own neural networks:
 
-## Pre-trained neural networks can be downloaded on Dryad. You can train your own neural networks as follows: 
-Quick-start with the default parameters.
+Pre-trained neural networks can be downloaded from Dryad. If you prefer to use pre-trained models, you can skip this section.<br>
+
+**You can train your own neural networks as follows:<br>**
 
 Training neural networks is done by simulating a large number of data sets and using the pattern frequency vectors together with the known topology
 to train a neural network to classify the topology or the model of sequence evolution. Simulations are conducted with the software [PolyMoSim available on github](https://github.com/cmayer/PolyMoSim). PolyMoSim has to be installed and must be available in the system path in order to run training tasks. The PolyMoSim software is not required if you only want to predict/classify models or topologies.
@@ -60,6 +61,14 @@ To see all available parameters, their description and usage, run:
 python3 ModelPredictorTraining.py --help
 python3 TopologyPredictorTraining.py --help
 ```
+
+## Topology and evolutionary model predictions/classifications:
+
+Topology and model predictions require the quartet-pattern-counter program to be in your system path or in the directory you run the python programs in.
+(Needs to be verified.)
+
+You can use pre-trained neural networks that can be downloaded from Dryad or you can train your own neural networks.
+
 ## Predicting models of sequence evolution for user specified alignments using pre-trained models: 
 
 Download pre-trained neural networks from [xxx](https://www.dryadcom) or use a model you have trained yourself.
