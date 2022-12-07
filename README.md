@@ -1,10 +1,10 @@
 # DeepNNPhylogeny
 A Deep Neural Networks for phylogenetic tree reonstructions. Currently it is limited to quartet trees. On quartet trees it performs in most cases as good as the maximum likelihood method.
 
-## Setup
-Conda environment installation 
+## Setup using the Anaconda package manager:
+First create a conda environment for your tensorflow module: 
 ```
-conda create --name name_of_the_conda_environment python tensorflow -c anaconda scikit-learn
+conda create --name name_of_the_conda_environment python tensorflow scikit-learn
 conda activate name_of_the_conda_environment
 ```
 
@@ -15,8 +15,9 @@ conda activate name_of_the_conda_environment
 unzip DeepNNPhylogeny-main.zip
 cd DeepNNPhylogeny-main/
 chmod u+x ModelPred_TopPred.sh
-cd quartet-pattern-counter-v1.1/
-./compile
+cd quartet-pattern-counter-v1.1_src/
+chmod u+x compile.sh
+./compile.sh
 cp quartet-pattern-counter-v1.1 /pathway/DeepNNPhylogeny-main/
 ```
 
