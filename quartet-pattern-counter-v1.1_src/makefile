@@ -3,9 +3,9 @@ CFLAGS = -O3 # -Wall -Wextra
 
 INCL =    -I .
 
-SRC    = quartet-pattern-counter.cpp symbol-cartesian-product_string.h
+SRC    = quartet-pattern-counter.cpp
 
-HEADER = numpy.h
+HEADER = numpy.h symbol-cartesian-product_string.h
 
 
 
