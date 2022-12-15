@@ -85,15 +85,14 @@ Download pre-trained neural networks from [xxx](https://www.dryadcom) or use a m
 ```
 python3 ModelPredictorLoaded.py -sequence_type (*) -NN_name (**) -alignment_file (***)
 ```
-where<br>
-(\*)   is DNA or AA, and <br>
+where (\*) is DNA or AA <br>
 (\*\*)  is a name of the substitution model neural network predictor folder  <br>
 (\*\*\*) is a name of the multiple-sequence-alignment file <br>
 For trained topology neural network run: 
 ```
 python3 TopologyPredictorLoaded.py -sequence_type (*) -NN_name (**) -alignment_file (***) -substitution_model (****)
 ```
-where * DNA or AA, and <br />
+where (\*) DNA or AA <br />
 (\*\*) is a name of the substitution model neural network predictor folder  <br />
 (\*\*\*) is a name of the multiple-sequence-alignment file <br />
 (\*\*\*\*) is 'JC','K2P','F81','F84','HKY','GTR' - nucleotide substitution models <br />
@@ -105,7 +104,7 @@ predict the tree topology based on the predicted substitution model.
 ```
 ./ModelPred_TopPred.sh  -s (*) -n (**) -a (***) 
 ```
-Where \** is DNA or AA <br />
+where (\*) is DNA or AA <br />
 (\*\*) is a name of the substitution model neural network predictor folder  <br />
 (\*\*\*) is a name of the multiple-sequence-alignment file <br />
 After substitution model prediction it will ask you for an input. You should enter the name of the topology prediction.
