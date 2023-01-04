@@ -46,13 +46,13 @@ args = parser.parse_args()
 
 python_random_seed = 13
 
-os.environ['MKL_NUM_THREADS'] = '10'
-os.environ['GOTO_NUM_THREADS'] = '10'
-os.environ['OMP_NUM_THREADS'] = '10'
+os.environ['MKL_NUM_THREADS'] = '56'
+os.environ['GOTO_NUM_THREADS'] = '56'
+os.environ['OMP_NUM_THREADS'] = '56'
 os.environ['openmp'] = 'True'
 
-tf.config.threading.set_inter_op_parallelism_threads(10)
-tf.config.threading.set_intra_op_parallelism_threads(10)
+tf.config.threading.set_inter_op_parallelism_threads(1)
+tf.config.threading.set_intra_op_parallelism_threads(1)
 
 tmpdir = os.getcwd() + "/"
 runID = str(os.getpid()*random.randint(1,100000))
@@ -118,7 +118,7 @@ global_min_pinv   = 0
 global_max_pinv   = 0.50
 global_min_shape  = 0.01
 global_max_shape  = 4
-# K2P, F84, HKY, GTR
+# K2P, F84, HKY
 global_min_tstv = 1.0
 global_max_tstv = 3.0
 # F81, F84, HKY, GTR
@@ -150,12 +150,6 @@ print("base_models_choice_aa:                ", base_models_choice_aa)
 
 ##### Grid search parameters:
 
-lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
-    initial_learning_rate=1e-2,
-    decay_steps=10000,
-    decay_rate=0.9)
-
-
 ad   = tf.keras.optimizers.Adam()
 
 def get_optimizer(name):
@@ -176,7 +170,7 @@ HPARAMS = [
 
 ##########
 
-### Evaluation routines: (moved here in Test2):
+### Evaluation routines: 
 def highest_likelihood (predictions):
     topo = []
     for prediction in predictions:
@@ -377,7 +371,7 @@ def simulate_random_lengths_random_free_model(topology, seed, base_model_list, m
     all_sim_filename = "all_sim_tree" + runID + ".txt"
     os.system("echo " + str(seed) + " >> " + all_sim_filename)
     os.system("cat " + sim_filename + " >> " + all_sim_filename)
-    command = "PolyMoSim-v1.1.3b -s " + str(
+    command = "PolyMoSim-v1.1.4 -s " + str(
         seed) + " -m " + model_filename + " -t " + sim_filename + " -f site_pattern_freq_relative_fill -n 1 1> " + seq_filename
     subprocess.run([command], shell=True)
     individual_frequencies = find_frequency(seq_filename)
@@ -1074,9 +1068,6 @@ print(temporary_2)
 
 # ANN training starts here
 
-sc = StandardScaler()
-frequency_array = sc.fit_transform(frequency_array)
-
 frequency_train, frequency_test, topology_train, topology_test = train_test_split(frequency_array, topology_array,
                                                                                   test_size=0.04, random_state=42)
 
@@ -1096,9 +1087,13 @@ if args.sequence_type == 'DNA':
 elif args.sequence_type == 'AA' :
     LEN = 160000
 
-def branched_model_1(hparam):
+
+
+def branched_model_1(hparam, normlayer):
     input = tf.keras.Input(shape=(LEN,))
-    x = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(input)
+    inputn = normlayer(input)
+
+    x = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(inputn)
     x = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x)
     x = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(x)
     x = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x)
@@ -1115,9 +1110,11 @@ def branched_model_1(hparam):
     return ann
 
 
-def branched_model_2(hparam):
+def branched_model_2(hparam, normlayer):
     input = tf.keras.Input(shape=(LEN,))
-    x = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(input)
+    inputn = normlayer(input)
+
+    x = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(inputn)
     x = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x)
     x = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(x)
     x = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x)
@@ -1126,7 +1123,7 @@ def branched_model_2(hparam):
 
     x_ann = tf.keras.Model(inputs=input, outputs=x)
 
-    y = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(input)
+    y = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(inputn)
     y = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(y)
     y = tf.keras.layers.Dense(units=128, activation=hparam[HP_ACTIVATION])(y)
     y = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(y)
@@ -1148,9 +1145,11 @@ def branched_model_2(hparam):
     return ann
 
 
-def branched_model_3(hparam):
+def branched_model_3(hparam, normlayer):
     input = tf.keras.Input(shape=(LEN,))
-    x = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(input)
+    inputn = normlayer(input)
+
+    x = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(inputn)
     x = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x)
     x = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(x)
     x = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x)
@@ -1158,7 +1157,7 @@ def branched_model_3(hparam):
 
     x_ann = tf.keras.Model(inputs=input, outputs=x)
 
-    y = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(input)
+    y = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(inputn)
     y = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(y)
     y = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(y)
     y = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(y)
@@ -1166,7 +1165,7 @@ def branched_model_3(hparam):
 
     y_ann = tf.keras.Model(inputs=input, outputs=y)
 
-    w = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(input)
+    w = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(inputn)
     w = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(w)
     w = tf.keras.layers.Dense(units=128, activation=hparam[HP_ACTIVATION])(w)
     w = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(w)
@@ -1187,9 +1186,11 @@ def branched_model_3(hparam):
     return ann
 
 
-def branched_model_10(hparam):
+def branched_model_10(hparam, normlayer):
     input = tf.keras.Input(shape=(LEN,))
-    x1 = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(input)
+    inputn = normlayer(input)
+
+    x1 = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(inputn)
     x1 = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x1)
     x1 = tf.keras.layers.Dense(units=128, activation=hparam[HP_ACTIVATION])(x1)
     x1 = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x1)
@@ -1198,51 +1199,51 @@ def branched_model_10(hparam):
     x1 = tf.keras.layers.Dense(units=32, activation=hparam[HP_ACTIVATION])(x1)
     x1_ann = tf.keras.Model(inputs=input, outputs=x1)
 
-    x2 = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(input)
+    x2 = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(inputn)
     x2 = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x2)
     x2 = tf.keras.layers.Dense(units=128, activation=hparam[HP_ACTIVATION])(x2)
     x2 = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x2)
     x2 = tf.keras.layers.Dense(units=32, activation=hparam[HP_ACTIVATION])(x2)
     x2_ann = tf.keras.Model(inputs=input, outputs=x2)
 
-    x3 = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(input)
+    x3 = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(inputn)
     x3 = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x3)
     x3 = tf.keras.layers.Dense(units=32, activation=hparam[HP_ACTIVATION])(x3)
     x3_ann = tf.keras.Model(inputs=input, outputs=x3)
 
-    x4 = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(input)
+    x4 = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(inputn)
     x4 = tf.keras.layers.Dropout(0.5)(x4)
     x4 = tf.keras.layers.Dense(units=16, activation=hparam[HP_ACTIVATION])(x4)
     x4 = tf.keras.layers.Dropout(0.5)(x4)
     x4 = tf.keras.layers.Dense(units=32, activation=hparam[HP_ACTIVATION])(x4)
     x4_ann = tf.keras.Model(inputs=input, outputs=x4)
 
-    x5 = tf.keras.layers.Dense(units=32, activation=hparam[HP_ACTIVATION])(input)
+    x5 = tf.keras.layers.Dense(units=32, activation=hparam[HP_ACTIVATION])(inputn)
     x5 = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x5)
     x5 = tf.keras.layers.Dense(units=32, activation=hparam[HP_ACTIVATION])(x5)
     x5_ann = tf.keras.Model(inputs=input, outputs=x5)
 
-    x6 = tf.keras.layers.Dense(units=64, activation=hparam[HP_ACTIVATION])(input)
+    x6 = tf.keras.layers.Dense(units=64, activation=hparam[HP_ACTIVATION])(inputn)
     x6 = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x6)
     x6 = tf.keras.layers.Dense(units=32, activation=hparam[HP_ACTIVATION])(x6)
     x6_ann = tf.keras.Model(inputs=input, outputs=x6)
 
-    x7 = tf.keras.layers.Dense(units=128, activation=hparam[HP_ACTIVATION])(input)
+    x7 = tf.keras.layers.Dense(units=128, activation=hparam[HP_ACTIVATION])(inputn)
     x7 = tf.keras.layers.Dropout(0.5)(x7)
     x7 = tf.keras.layers.Dense(units=32, activation=hparam[HP_ACTIVATION])(x7)
     x7_ann = tf.keras.Model(inputs=input, outputs=x7)
 
-    x8 = tf.keras.layers.Dense(units=111, activation=hparam[HP_ACTIVATION])(input)
+    x8 = tf.keras.layers.Dense(units=111, activation=hparam[HP_ACTIVATION])(inputn)
     x8 = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x8)
     x8 = tf.keras.layers.Dense(units=32, activation=hparam[HP_ACTIVATION])(x8)
     x8_ann = tf.keras.Model(inputs=input, outputs=x8)
 
-    x9 = tf.keras.layers.Dense(units=77, activation="relu")(input)
+    x9 = tf.keras.layers.Dense(units=77, activation="relu")(inputn)
     x9 = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x9)
     x9 = tf.keras.layers.Dense(units=32, activation="relu")(x9)
     x9_ann = tf.keras.Model(inputs=input, outputs=x9)
 
-    x10 = tf.keras.layers.Dense(units=155, activation="relu")(input)
+    x10 = tf.keras.layers.Dense(units=155, activation="relu")(inputn)
     x10 = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x10)
     x10 = tf.keras.layers.Dense(units=64, activation="relu")(x10)
     x10 = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x10)
@@ -1265,10 +1266,12 @@ def branched_model_10(hparam):
     return ann
 
 
-def branched_model_1u(hparam):
+def branched_model_1u(hparam, normlayer):
     input = tf.keras.Input(shape=(LEN,))
+    inputn = normlayer(input)
+
     x3 = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(
-        input)  # different variable names - for purposes?
+        inputn) 
     x4 = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x3)
     x5 = tf.keras.layers.Dense(units=128, activation=hparam[HP_ACTIVATION])(x4)
     x6d = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x5)
@@ -1276,9 +1279,9 @@ def branched_model_1u(hparam):
     x7d = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x7)
     x8 = tf.keras.layers.Dense(units=64, activation=hparam[HP_ACTIVATION])(x7d)
     x9 = tf.keras.layers.Dense(units=128, activation=hparam[HP_ACTIVATION])(x8)
-    #    x9d = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x9)
+
     x10 = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(x9)
-    #    x10d= tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x10)
+
     x11 = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(x10)
     x14 = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x11)
     x15 = tf.keras.layers.Dense(units=128, activation=hparam[HP_ACTIVATION])(x14)
@@ -1295,9 +1298,11 @@ def branched_model_1u(hparam):
     return ann
 
 
-def branched_model_cu(hparam):
+def branched_model_cu(hparam, normlayer):
     input = tf.keras.Input(shape=(LEN,))
-    x3 = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(input)
+    inputn = normlayer(input)
+
+    x3 = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(inputn)
     x4 = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x3)
     x5 = tf.keras.layers.Dense(units=128, activation=hparam[HP_ACTIVATION])(x4)
     x6d = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x5)
@@ -1329,9 +1334,11 @@ def branched_model_cu(hparam):
     return ann
 
 
-def branched_model_cud(hparam):
+def branched_model_cud(hparam, normlayer):
     input = tf.keras.Input(shape=(LEN,))
-    x3 = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(input)
+    inputn = normlayer(input)
+
+    x3 = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(inputn)
     x4 = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x3)
     x5 = tf.keras.layers.Dense(units=128, activation=hparam[HP_ACTIVATION])(x4)
     x6d = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x5)
@@ -1363,22 +1370,20 @@ def branched_model_cud(hparam):
     return ann
 
 
-def run_hparam_one_model_one_hset(model_func, X_train, Y_train, X_test, Y_test, hparams, do_probabilities=False):
-    model = model_func(hparams)
+def run_hparam_one_model_one_hset(model_func, X_train, Y_train, X_test, Y_test, hparams, normlayer, do_probabilities=False):
+    model = model_func(hparams, normlayer)
 
-    logdir = "model_b10"
+    logdir = 'TopPred' + args.substitution_model + '_' + args.neural_network + '_' + args.epochs + '.log' 
     callback = tf.keras.callbacks.TensorBoard(logdir, profile_batch=0)
     hparams_callback = hp.KerasCallback(logdir, hparams)
 
     result = model.fit(x=X_train, y=Y_train, batch_size=256, epochs=EPOCHS, validation_data=(X_test, Y_test),
                        callbacks=[callback, hparams_callback], verbose=2)
 
-    return model  ### result #, pred
+    return model  ### result 
 
 
-def run_hparam_on_grid(model_func, X_train, Y_train, X_test, Y_test):
-    with tf.summary.create_file_writer("tf_hparams_log.log").as_default():
-        hp.hparams_config(hparams=HPARAMS, metrics=[hp.Metric(METRIC_ACCURACY, display_name='Accuracy')])
+def run_hparam_on_grid(model_func, X_train, Y_train, X_test, Y_test, normlayer):
 
     session_num = 0
 
@@ -1391,57 +1396,59 @@ def run_hparam_on_grid(model_func, X_train, Y_train, X_test, Y_test):
                 run_name = "run-%d" % session_num
                 print('--- Starting trial: %s' % run_name)
                 print({h.name: hparams[h] for h in hparams})
-                fitted_model = run_hparam_one_model_one_hset(model_func, X_train, Y_train, X_test, Y_test, hparams)
+                fitted_model = run_hparam_one_model_one_hset(model_func, X_train, Y_train, X_test, Y_test, hparams, normlayer)
                 print("Hparams:", hparams)
-                print_highest_likelihood_evaluation(fitted_model, sc.transform(temporary_0), sc.transform(temporary_1),
-                                                    sc.transform(temporary_2))
+                print_highest_likelihood_evaluation(fitted_model, temporary_0, temporary_1,
+                                                    temporary_2)
 
                 session_num += 1
                 if args.substitution_model == 'DAY':
-                    fitted_model.save('TopPred' + 'Dayhoff' + '.' + args.neural_network)
+                    fitted_model.save('TopPred' + 'Dayhoff' + '_' + args.epochs + '.' + args.neural_network)
                 else:
-                    fitted_model.save('TopPred' + args.substitution_model + '.' + args.neural_network)
+                    fitted_model.save('TopPred' + args.substitution_model  + '_' + args.epochs + '.' + args.neural_network)
 
 
 ############
 ### Main:
 ############
 
+normlayer = tf.keras.layers.experimental.preprocessing.Normalization()
+normlayer.adapt(frequency_train)
 
 if args.neural_network == 'b1':
     run_hparam_on_grid(branched_model_1,
                        frequency_train, topology_train,
-                       frequency_test, topology_test
+                       frequency_test, topology_test, normlayer
             )
 elif args.neural_network == 'b2':
     run_hparam_on_grid(branched_model_2,
                        frequency_train, topology_train,
-                       frequency_test, topology_test
+                       frequency_test, topology_test, normlayer
             )
 elif args.neural_network == 'b3':
     run_hparam_on_grid(branched_model_3,
                        frequency_train, topology_train,
-                       frequency_test, topology_test
+                       frequency_test, topology_test, normlayer
             )
 elif args.neural_network == 'b10':
     run_hparam_on_grid(branched_model_10,
                        frequency_train, topology_train,
-                       frequency_test, topology_test
+                       frequency_test, topology_test, normlayer
                        )
 elif args.neural_network == 'u':
     run_hparam_on_grid(branched_model_1u,
                        frequency_train, topology_train,
-                       frequency_test, topology_test
+                       frequency_test, topology_test, normlayer
             )
 elif args.neural_network == 'cu':
     run_hparam_on_grid(branched_model_cu,
                        frequency_train, topology_train,
-                       frequency_test, topology_test
+                       frequency_test, topology_test, normlayer
             )
 elif args.neural_network == 'cud':
     run_hparam_on_grid(branched_model_cud,
                        frequency_train, topology_train,
-                       frequency_test, topology_test
+                       frequency_test, topology_test, normlayer
             )
 
 sys.exit(0)

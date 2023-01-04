@@ -47,25 +47,23 @@ tf.config.threading.set_intra_op_parallelism_threads(10)
 sc = StandardScaler()
 str = args.alignment_file + '_' + args.NN_name + '_' + 'substitution_model.txt'
 str = str.replace("/", "")
-# str = str.replace(".fas","")
+
 alignment_file = args.alignment_file
 
 f = open(str, "w")
+
 # load model
 model = load_model(args.NN_name)
+
 if args.sequence_type == 'DNA':
     if os.path.isfile(alignment_file):
         command = './quartet-pattern-counter-v1.1 ' + alignment_file + ' /dev/shm/out.npy'
         subprocess.run([command], shell=True)
         frequency_array = np.load('/dev/shm/out.npy')
-        print('frequency array: ')
-        print(frequency_array)
         frequency_array = np.reshape(frequency_array,(1,-1))
-#        freq_ar = sc.fit_transform(frequency_array)
         prediction = model.predict(frequency_array)
-        print(prediction)
+        print('softmax values: ', prediction)
         x = argmax(prediction)
-        print(x)
         y = x.item()
         print(y)
         if y == 0:
@@ -92,16 +90,11 @@ elif args.sequence_type == 'AA':
         command = './quartet-pattern-counter-v1.1 -p ' + alignment_file + ' /dev/shm/out.npy'
         subprocess.run([command], shell=True)
         frequency_array = np.load('/dev/shm/out.npy')
-        print('frequency array: ')
-        print(frequency_array)
         frequency_array = np.reshape(frequency_array, (1, -1))
-#        freq_ar = sc.fit_transform(frequency_array)
         prediction = model.predict(frequency_array)
-        print(prediction)
+        print('softmax values: ', prediction)
         x = argmax(prediction)
-        print(x)
         y = x.item()
-        print(y)
         if y == 0:
             print('JTT')
             f.write('JTT')

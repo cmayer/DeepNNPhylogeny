@@ -35,8 +35,6 @@ parser.add_argument('-alignment_file',type=str, help="Compulsory argument. Enter
 
 args = parser.parse_args()
 
-python_random_seed = 13
-
 os.environ['MKL_NUM_THREADS'] = '10'
 os.environ['GOTO_NUM_THREADS'] = '10'
 os.environ['OMP_NUM_THREADS'] = '10'
@@ -63,7 +61,6 @@ def tree_topology(topology,m):
 
 model = load_model(args.NN_name)
 alignment_file = args.alignment_file
-sc = StandardScaler()
 
 if args.sequence_type == 'DNA':
     command = './quartet-pattern-counter-v1.1 ' + alignment_file + ' /dev/shm/out.npy'
@@ -72,10 +69,9 @@ elif args.sequence_type == 'AA':
 subprocess.run([command], shell=True)
 frequency_array = np.load('/dev/shm/out.npy')
 frequency_array = np.reshape(frequency_array,(1,-1))
-#freq_ar = sc.fit_transform(frequency_array)
 prediction = model.predict(frequency_array)
 x = argmax(prediction)
-print(prediction)
+print('softmax values: ', prediction)
 y = x.item()
 tree = tree_topology(y,args.substitution_model)
 tree = Phylo.read(StringIO(tree), 'newick')
