@@ -1,27 +1,21 @@
 #!/usr/bin/env python3
 
-## Fewer nodes in inter layers. Less layers in u models.
+## Import libraries
 
 import subprocess
 import os
 import itertools
 import numpy as np
-from   sklearn.naive_bayes import GaussianNB
 import tensorflow as tf
 import random
 import math
-
 import sys
 import argparse
 from numpy import argmax
-
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import GridSearchCV, train_test_split
-from tensorboard.plugins.hparams import api as hp
 from keras.models import load_model
 from Bio import Phylo
 from io import StringIO
-
+from configparser import ConfigParser
 
 # Argparse arguments
 
@@ -43,31 +37,108 @@ os.environ['openmp'] = 'True'
 tf.config.threading.set_inter_op_parallelism_threads(10)
 tf.config.threading.set_intra_op_parallelism_threads(10)
 
+config = ConfigParser()
+config_file = "DeepNNPhylogeny.config"
+
+def quartet_pattern(q):
+    command = q
+    output = subprocess.check_output([command], shell=True)
+    output = str(output)
+    if output.startswith('Usage:'): 
+        pass
+    else:
+        print('quartet-pattern-counter-v1.1 was not found!')
+        sys.exit()
+
+def read_alignment_file(alignment_file):
+    f = open(str, "r")
+    return_list = [] 
+    for line in f :
+        line = line.rstrip()
+        if ">" in line : 
+            line = line.replace(">","")
+            line = line.split(" ")
+            return_list.append(line[0])
+    return return_list          
 
 def tree_topology(topology,m):
     if topology == 0:
-        string = "1.0 Model_" + m + " ((A,B),(C,D))"
+        header_list = read_alignment_file(args.alignment_file)
+        string = "1.0 Model_" + m + "((" + header_list[0] + "," 
+        + header_list[1] + "),(" + header_list[2] + "," + header_list[3] + "))"
         print(string)
-        return "((A,B),(C,D))"
+        return string
     elif topology == 1:
+        header_list = read_alignment_file(args.alignment_file)
+        string = "1.0 Model_" + m + "((" + header_list[0] + "," 
+        + header_list[2] + "),(" + header_list[1] + "," + header_list[3] + "))"
         string = "1.0 Model_" + m + " ((A,C),(B,D))"
         print(string)
-        return "((A,C),(B,D))"
+        return string
     elif topology == 2:
+        header_list = read_alignment_file(args.alignment_file)
+        string = "1.0 Model_" + m + "((" + header_list[0] + "," 
+        + header_list[3] + "),(" + header_list[2] + "," + header_list[1] + "))"
         string = "1.0 Model_" + m + " ((A,D),(C,B))"
         print(string)
-        return "((A,D),(C,B))"
+        return string
 
+def check_read_config():
+    first_check = os.getcwd() + "/" + config_file
+    home_dir = os.path.expanduser("~") + "/" 
+    second_check = home_dir + config_file
+    third_check = home_dir + "DeepNNPhylogeny-main/" + config_file 
+    if os.path.isfile(first_check):
+        print("The config file: ", first_check, " was found!")
+        config.read(first_check)
+        return config
+    elif os.path.isfile(second_check):
+        print("The config file: ", second_check, " was found!")
+        config.read(second_check)
+        return config
+    elif os.path.isfile(third_check):
+        print("The config file: ", third_check, " was found!")
+        config.read(third_check)
+        return config
+    else:     
+        print("Configuration file was not found!")
+        sys.exit()
+
+
+def search_for_the_NN(conf):
+    if os.path.isdir(args.NN_name):
+        model = load_model(args.NN_name)
+        return model
+    elif (os.path.isdir(args.NN_name) == False):
+        NN_name = args.NN_name.replace("/", "")
+        config_NN = conf["NN-Search-Path"]
+        for i in range(0,13):
+            pathway_to_NN = config_NN[i]
+            pathway_to_NN = pathway_to_NN + NN_name
+            if os.path.isdir(pathway_to_NN):
+                model = load_model(pathway_to_NN)
+                break
+        return model
+    else: 
+        print("Neural network model was not found!")
+        sys.exit()
+
+# Check whether the config file exists 
+config = check_read_config()
+# Check whether the NN exist and load model 
+model = search_for_the_NN(config)
 
 model = load_model(args.NN_name)
 alignment_file = args.alignment_file
+quartet_pattern("quartet-pattern-counter-v1.1")
 
 if args.sequence_type == 'DNA':
-    command = './quartet-pattern-counter-v1.1 ' + alignment_file + ' /dev/shm/out.npy'
+    command = 'quartet-pattern-counter-v1.1 ' + alignment_file + " " + os.getcwd() + "/out.npy"
 elif args.sequence_type == 'AA':
-    command = './quartet-pattern-counter-v1.1 -p ' + alignment_file + ' /dev/shm/out.npy'
+    command = 'quartet-pattern-counter-v1.1 -p ' + alignment_file + " " + os.getcwd() + "/out.npy"
 subprocess.run([command], shell=True)
-frequency_array = np.load('/dev/shm/out.npy')
+path = os.getcwd() + "/out.npy"
+frequency_array = np.load(path)
 frequency_array = np.reshape(frequency_array,(1,-1))
 prediction = model.predict(frequency_array)
 x = argmax(prediction)

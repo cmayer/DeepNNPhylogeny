@@ -1068,9 +1068,6 @@ elif args.sequence_type == 'AA':
     print(temporary_DAY)
 # ANN training starts here
 
-sc = StandardScaler()
-frequency_array = sc.fit_transform(frequency_array)
-
 frequency_train, frequency_test, evo_mod_train, evo_mod_test = train_test_split(frequency_array, evo_mod_array,
                                                                                   test_size=0.04, random_state=42)
 
@@ -1427,15 +1424,17 @@ def run_hparam_on_grid(model_func, X_train, Y_train, X_test, Y_test, normlayer):
                 fitted_model = run_hparam_one_model_one_hset(model_func, X_train, Y_train, X_test, Y_test, hparams, normlayer)
                 print("Hparams:", hparams)
                 if args.sequence_type == 'DNA':
-                    print_highest_likelihood_evaluation(fitted_model, sc.transform(temporary_JC), sc.transform(temporary_K2P),
-                                                    sc.transform(temporary_F81),
-                                                    sc.transform(temporary_HKY), sc.transform(temporary_GTR))
+                    print_highest_likelihood_evaluation(fitted_model, temporary_JC, temporary_K2P,
+                                                    temporary_F81,
+                                                    temporary_HKY, temporary_GTR)
                     fitted_model.save('DNAmodelpred' + '_' + args.epochs + '.' + args.neural_network)
+                    print('The name of the saved NN: DNAmodelpred' + '_' + args.epochs + '.' + args.neural_network)
                 elif args.sequence_type == 'AA':
-                        print_highest_likelihood_evaluation(fitted_model, sc.transform(temporary_JTT),
-                                                            sc.transform(temporary_LG),
-                                                            sc.transform(temporary_WAG), sc.transform(temporary_DAY))
+                        print_highest_likelihood_evaluation(fitted_model, temporary_JTT,
+                                                            temporary_LG,
+                                                            temporary_WAG, temporary_DAY)
                         fitted_model.save('AAmodelpred' + '_' + args.epochs + '.' + args.neural_network)
+                        print('The name of the saved NN: AAmodelpred' + '_' + args.epochs + '.' + args.neural_network)
                 session_num += 1
 
 

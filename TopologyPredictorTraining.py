@@ -11,11 +11,9 @@ import tensorflow as tf
 import random
 import time
 import math
-#import autokeras as ak
 import sys
 import argparse
 
-#import keras_tuner as kt
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV, train_test_split
@@ -1404,9 +1402,10 @@ def run_hparam_on_grid(model_func, X_train, Y_train, X_test, Y_test, normlayer):
                 session_num += 1
                 if args.substitution_model == 'DAY':
                     fitted_model.save('TopPred' + 'Dayhoff' + '_' + args.epochs + '.' + args.neural_network)
+                    print('The name of the saved NN: TopPredDayhoff_' + args.epochs + '.' + args.neural_network)
                 else:
                     fitted_model.save('TopPred' + args.substitution_model  + '_' + args.epochs + '.' + args.neural_network)
-
+                    print('The name of the saved NN: TopPred' + args.substitution_model  + '_' + args.epochs + '.' + args.neural_network)
 
 ############
 ### Main:
