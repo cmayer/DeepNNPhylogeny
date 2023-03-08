@@ -11,8 +11,10 @@ This repository contains the software for training und using neural networks for
 ## Installing the required machine learning libraries using the Anaconda package manager:
 It is recommended to create a conda environment for your tensorflow module: 
 ```
-conda create --name name_of_the_conda_environment python tensorflow scikit-learn
+conda create --name name_of_the_conda_environment 
 conda activate name_of_the_conda_environment
+conda install tensorflow
+
 ```
 
 ## On Linux and Mac OS X the DeepNNPhylogeny software can be installed as follows:
@@ -28,13 +30,13 @@ cd DeepNNPhylogeny-main/
 chmod u+x ModelPred_TopPred.sh
 cd quartet-pattern-counter-v1.1_src/
 make
-# If make is not installed, type: chmod u+x compile.sh; ./compile.sh
-cp quartet-pattern-counter-v1.1 /pathway/DeepNNPhylogeny-main/
+# If "make" is not installed, type: chmod u+x compile.sh; ./compile.sh
 ```
+- Make sure that you copy the compiled quartet-pattern-counter-v1.1 program to a folder that is listed in your $PATH variable so that your system can always find it, or copy it to the folder you want to use it from, or specify the full path to the program.
 
 ## Training your own neural networks:
 
-Pre-trained neural networks can be downloaded from Dryad. If you prefer to use pre-trained models, you can skip this section.<br>
+Pre-trained neural networks can be downloaded from Dryad (link will be placed here soon). If you prefer to use pre-trained models, you can skip next section.<br>
 
 **You can train your own neural networks as follows:<br>**
 
@@ -109,4 +111,7 @@ where (\*) is DNA or AA <br />
 (\*\*\*) is a name of the multiple-sequence-alignment file <br />
 After substitution model prediction it will ask you for an input. You should enter the name of the topology prediction.
 
+
+## Frequently asked questions <a id="Frequently-aksed-questions"></a>
+No questions have been asked so far.
 
