@@ -54,7 +54,7 @@ python3 ModelPredictorTraining.py -sequence_type AA
 ```
 for amino acid sequences. 
 
-In order to train a neural network for topology prediction run:
+In order to train a neural network with default parameters for topology prediction run:
 ```
 python3 TopologyPredictorTraining.py  -sequence_type (*) -substitution_model (**)
 ```
@@ -70,19 +70,21 @@ python3 TopologyPredictorTraining.py --help
 ```
 
 Simulating amino acid data sets takes much longer than simulating nucleotide data sets.
-For a large number of amino acid replicates, we recommend to use multiprocessing library and to conduct the training on a computer with a large number of core. A program to conduct the training on a large number of cores can be found in folder multiprocessing" folder.
+For a large number of amino acid replicates, we recommend to use multiprocessing library (will be added to the program soon) and to conduct the training on a computer with a large number of core. 
 
 
 ## Topology and evolutionary model predictions/classifications:
 
 Topology and model predictions require the quartet-pattern-counter program to be in your system path or in the directory you run the python programs in.
-(Needs to be verified.)
 
-You can use pre-trained neural networks that can be downloaded from Dryad or you can train your own neural networks.
+You can use pre-trained neural networks that can be downloaded from Dryad (link will be available soon) or you can train your own neural networks.
 
 ## Predicting models of sequence evolution for user specified alignments using pre-trained models: 
 
 Download pre-trained neural networks from [xxx](https://www.dryadcom) or use a model you have trained yourself.
+The programs search for the neural network in the working directory, specified path to the neural network, or DeepNNPhylogeny.config file.
+Make sure that you have placed a DeepNNPhylogeny.config file in the working directory, the home directory, or the DeepNNPhylogeny-main folder placed in the home directory. 
+The default content of the DeepNNPhylogeny.config is the DryAD folders contained pre-trained NNs. 
 
 ```
 python3 ModelPredictorLoaded.py -sequence_type (*) -NN_name (**) -alignment_file (***)
