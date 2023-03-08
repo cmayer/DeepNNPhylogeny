@@ -14,7 +14,6 @@ It is recommended to create a conda environment for your tensorflow module:
 conda create --name name_of_the_conda_environment 
 conda activate name_of_the_conda_environment
 conda install tensorflow
-
 ```
 
 ## On Linux and Mac OS X the DeepNNPhylogeny software can be installed as follows:
@@ -111,7 +110,7 @@ predict the tree topology based on the predicted substitution model.
 where (\*) is DNA or AA <br />
 (\*\*) is a name of the substitution model neural network predictor folder  <br />
 (\*\*\*) is a name of the multiple-sequence-alignment file <br />
-After substitution model prediction it will ask you for an input. You should enter the name of the topology prediction.
+After substitution model prediction it will ask you for an input. You should enter the name of the topology prediction NN.
 
 
 ## Frequently asked questions <a id="Frequently-aksed-questions"></a>
