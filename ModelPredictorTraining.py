@@ -1393,10 +1393,10 @@ def run_hparam_one_model_one_hset(model_func, X_train, Y_train, X_test, Y_test, 
     model = model_func(hparams, normlayer)
 
     if args.sequence_type == 'DNA':
-        logdir = 'DNAmodelpred' + '_'  + args.epochs + '_' + args.neural_network + '.log'
+        logdir = 'DNAmodelpred' + '_'  + str(args.epochs) + '_' + args.neural_network + '.log'
 
     elif args.sequence_type == 'AA':
-            logdir = 'AAmodelpred' + '_' + args.epochs + '_' + args.neural_network + '.log'
+            logdir = 'AAmodelpred' + '_' + str(args.epochs) + '_' + args.neural_network + '.log'
    
     callback = tf.keras.callbacks.TensorBoard(logdir, profile_batch=0)
     hparams_callback = hp.KerasCallback(logdir, hparams)
@@ -1427,14 +1427,14 @@ def run_hparam_on_grid(model_func, X_train, Y_train, X_test, Y_test, normlayer):
                     print_highest_likelihood_evaluation(fitted_model, temporary_JC, temporary_K2P,
                                                     temporary_F81,
                                                     temporary_HKY, temporary_GTR)
-                    fitted_model.save('DNAmodelpred' + '_' + args.epochs + '.' + args.neural_network)
-                    print('The name of the saved NN: DNAmodelpred' + '_' + args.epochs + '.' + args.neural_network)
+                    fitted_model.save('DNAmodelpred' + '_' + str(args.epochs) + '.' + args.neural_network)
+                    print('The name of the saved NN: DNAmodelpred' + '_' + str(args.epochs) + '.' + args.neural_network)
                 elif args.sequence_type == 'AA':
                         print_highest_likelihood_evaluation(fitted_model, temporary_JTT,
                                                             temporary_LG,
                                                             temporary_WAG, temporary_DAY)
-                        fitted_model.save('AAmodelpred' + '_' + args.epochs + '.' + args.neural_network)
-                        print('The name of the saved NN: AAmodelpred' + '_' + args.epochs + '.' + args.neural_network)
+                        fitted_model.save('AAmodelpred' + '_' + str(args.epochs) + '.' + args.neural_network)
+                        print('The name of the saved NN: AAmodelpred' + '_' + str(args.epochs) + '.' + args.neural_network)
                 session_num += 1
 
 

@@ -4,11 +4,8 @@
 
 import subprocess
 import os
-import itertools
 import numpy as np
 import tensorflow as tf
-import random
-import math
 import sys
 import argparse
 from numpy import argmax
@@ -38,15 +35,12 @@ tf.config.threading.set_intra_op_parallelism_threads(10)
 config = ConfigParser()
 config_file = "DeepNNPhylogeny.config"
 
-def quartet_pattern(q):
-    command = q
-    output = subprocess.check_output([command], shell=True)
-    output = str(output)
-    if output.startswith('Usage:'): 
-        pass
-    else:
-        print('quartet-pattern-counter-v1.1 was not found!')
-        sys.exit()
+def is_quartet_counter_available():
+    try:
+        subprocess.check_output(['which', 'quartet-pattern-counter-v1.1'])
+        return True
+    except subprocess.CalledProcessError:
+        return False
 
 def check_read_config():
     first_check = os.getcwd() + "/" + config_file
@@ -92,7 +86,8 @@ def search_for_the_NN(conf):
 # my main program starts here:
 ####################################
 
-str = args.alignment_file + '_' + args.NN_name + '_' + 'substitution_model.txt'
+str = args.alignment_file.replace(".fas","")
+str = str + '_' + args.NN_name + '_' + 'substitution_model.txt'
 str = str.replace("/", "")
 
 alignment_file = args.alignment_file
@@ -107,8 +102,16 @@ config = check_read_config()
 # Check whether the NN exist and load model 
 model = search_for_the_NN(config)
 
+# Check for the quartet-pattern-counter
+
+if is_quartet_counter_available():
+    print("quartet-pattern-counter-v1.1 is available")
+else:
+    print("quartet-pattern-counter-v1.1 is not available")
+
+
 if args.sequence_type == 'DNA':
-    quartet_pattern("quartet-pattern-counter-v1.1")
+#    quartet_pattern("quartet-pattern-counter-v1.1")
     if os.path.isfile(alignment_file):
         command = 'quartet-pattern-counter-v1.1 ' + alignment_file + " " + os.getcwd() + "/out.npy"
         path =  os.getcwd() + "/out.npy"
@@ -116,10 +119,10 @@ if args.sequence_type == 'DNA':
         frequency_array = np.load(path)
         frequency_array = np.reshape(frequency_array,(1,-1))
         prediction = model.predict(frequency_array)
-        print('softmax values: ', prediction)
+        print("The order of the models: JC, K2P, F81, HKY, GTR ")
+        print('The softmax values of the models: ', prediction)
         x = argmax(prediction)
         y = x.item()
-        print(y)
         if y == 0:
             print('JC')
             f.write('JC')
@@ -147,7 +150,8 @@ elif args.sequence_type == 'AA':
         frequency_array = np.load(path)
         frequency_array = np.reshape(frequency_array, (1, -1))
         prediction = model.predict(frequency_array)
-        print('softmax values: ', prediction)
+        print("The order of the models: JTT, LG, WAG, Dayhoff")
+        print('The softmax values of the models: ', prediction)
         x = argmax(prediction)
         y = x.item()
         if y == 0:
@@ -166,4 +170,6 @@ elif args.sequence_type == 'AA':
         print("The multiplealignment file does not exist!")
         print("Please try again.")
         sys.exit()
+
+os.remove("out.npy")
 f.close()

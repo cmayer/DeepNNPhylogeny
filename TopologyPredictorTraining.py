@@ -1371,7 +1371,7 @@ def branched_model_cud(hparam, normlayer):
 def run_hparam_one_model_one_hset(model_func, X_train, Y_train, X_test, Y_test, hparams, normlayer, do_probabilities=False):
     model = model_func(hparams, normlayer)
 
-    logdir = 'TopPred' + args.substitution_model + '_' + args.neural_network + '_' + args.epochs + '.log' 
+    logdir = 'TopPred' + args.substitution_model + '_' + args.neural_network + '_' + str(args.epochs) + '.log' 
     callback = tf.keras.callbacks.TensorBoard(logdir, profile_batch=0)
     hparams_callback = hp.KerasCallback(logdir, hparams)
 
@@ -1401,11 +1401,11 @@ def run_hparam_on_grid(model_func, X_train, Y_train, X_test, Y_test, normlayer):
 
                 session_num += 1
                 if args.substitution_model == 'DAY':
-                    fitted_model.save('TopPred' + 'Dayhoff' + '_' + args.epochs + '.' + args.neural_network)
-                    print('The name of the saved NN: TopPredDayhoff_' + args.epochs + '.' + args.neural_network)
+                    fitted_model.save('TopPred' + 'Dayhoff' + '_' + str(args.epochs) + '.' + args.neural_network)
+                    print('The name of the saved NN: TopPredDayhoff_' + str(args.epochs) + '.' + args.neural_network)
                 else:
-                    fitted_model.save('TopPred' + args.substitution_model  + '_' + args.epochs + '.' + args.neural_network)
-                    print('The name of the saved NN: TopPred' + args.substitution_model  + '_' + args.epochs + '.' + args.neural_network)
+                    fitted_model.save('TopPred' + args.substitution_model  + '_' + str(args.epochs) + '.' + args.neural_network)
+                    print('The name of the saved NN: TopPred' + args.substitution_model  + '_' + str(args.epochs) + '.' + args.neural_network)
 
 ############
 ### Main:

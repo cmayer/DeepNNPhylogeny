@@ -4,11 +4,8 @@
 
 import subprocess
 import os
-import itertools
 import numpy as np
 import tensorflow as tf
-import random
-import math
 import sys
 import argparse
 from numpy import argmax
@@ -40,18 +37,16 @@ tf.config.threading.set_intra_op_parallelism_threads(10)
 config = ConfigParser()
 config_file = "DeepNNPhylogeny.config"
 
-def quartet_pattern(q):
-    command = q
-    output = subprocess.check_output([command], shell=True)
-    output = str(output)
-    if output.startswith('Usage:'): 
-        pass
-    else:
-        print('quartet-pattern-counter-v1.1 was not found!')
-        sys.exit()
+
+def is_quartet_counter_available():
+    try:
+        subprocess.check_output(['which', 'quartet-pattern-counter-v1.1'])
+        return True
+    except subprocess.CalledProcessError:
+        return False
 
 def read_alignment_file(alignment_file):
-    f = open(str, "r")
+    f = open(alignment_file, "r")
     return_list = [] 
     for line in f :
         line = line.rstrip()
@@ -64,22 +59,17 @@ def read_alignment_file(alignment_file):
 def tree_topology(topology,m):
     if topology == 0:
         header_list = read_alignment_file(args.alignment_file)
-        string = "1.0 Model_" + m + "((" + header_list[0] + "," 
-        + header_list[1] + "),(" + header_list[2] + "," + header_list[3] + "))"
+        string = "1.0 Model_" + m + "((" + str(header_list[0]) + ","  + str(header_list[1]) + "),(" + str(header_list[2]) + "," + str(header_list[3]) + "))"
         print(string)
         return string
     elif topology == 1:
         header_list = read_alignment_file(args.alignment_file)
-        string = "1.0 Model_" + m + "((" + header_list[0] + "," 
-        + header_list[2] + "),(" + header_list[1] + "," + header_list[3] + "))"
-        string = "1.0 Model_" + m + " ((A,C),(B,D))"
+        string = "1.0 Model_" + m + "((" + str(header_list[0]) + "," + str(header_list[2]) + "),(" + str(header_list[1]) + "," + str(header_list[3]) + "))"
         print(string)
         return string
     elif topology == 2:
         header_list = read_alignment_file(args.alignment_file)
-        string = "1.0 Model_" + m + "((" + header_list[0] + "," 
-        + header_list[3] + "),(" + header_list[2] + "," + header_list[1] + "))"
-        string = "1.0 Model_" + m + " ((A,D),(C,B))"
+        string = "1.0 Model_" + str(m) + "((" + str(header_list[0]) + "," + str(header_list[3]) + "),(" + str(header_list[2]) + "," + str(header_list[1]) + "))"
         print(string)
         return string
 
@@ -130,7 +120,13 @@ model = search_for_the_NN(config)
 
 model = load_model(args.NN_name)
 alignment_file = args.alignment_file
-quartet_pattern("quartet-pattern-counter-v1.1")
+
+# Check the quartet-pattern-counter-v1.1 availability
+if is_quartet_counter_available():
+    print("quartet-pattern-counter-v1.1 is available")
+else:
+    print("quartet-pattern-counter-v1.1 is not available")
+
 
 if args.sequence_type == 'DNA':
     command = 'quartet-pattern-counter-v1.1 ' + alignment_file + " " + os.getcwd() + "/out.npy"
@@ -142,13 +138,18 @@ frequency_array = np.load(path)
 frequency_array = np.reshape(frequency_array,(1,-1))
 prediction = model.predict(frequency_array)
 x = argmax(prediction)
-print('softmax values: ', prediction)
+print('The softmax values of topologies: ', prediction)
 y = x.item()
 tree = tree_topology(y,args.substitution_model)
 tree = Phylo.read(StringIO(tree), 'newick')
-Phylo.write(tree, "tree_topology_" + args.alignment_file + '_' + args.NN_name +".nwk", "newick")
-
-
+temporary_str = args.alignment_file.replace(".fas","")
+neural_name = args.NN_name.replace("/","")
+Phylo.write(tree, "tree_topology_" + temporary_str + '_' + neural_name +".nwk", "newick")
+os.remove("out.npy")
+# out_file =  "tree_topology_" + temporary_str + '_' + neural_name +".nwk"
+# f = open(out_file, "w")
+# f.write(tree)
+# f.close()
 
 
 
