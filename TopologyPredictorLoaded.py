@@ -10,9 +10,11 @@ import sys
 import argparse
 from numpy import argmax
 from keras.models import load_model
-from Bio import Phylo
-from io import StringIO
 from configparser import ConfigParser
+# These libraries will be needed when tree length prediction is introduced 
+#from Bio import Phylo
+#from io import StringIO 
+
 
 # Argparse arguments
 
@@ -59,18 +61,18 @@ def read_alignment_file(alignment_file):
 def tree_topology(topology,m):
     if topology == 0:
         header_list = read_alignment_file(args.alignment_file)
-        string = "1.0 Model_" + m + "((" + str(header_list[0]) + ","  + str(header_list[1]) + "),(" + str(header_list[2]) + "," + str(header_list[3]) + "))"
-        print(string)
+        string = "((" + str(header_list[0]) + ","  + str(header_list[1]) + "),(" + str(header_list[2]) + "," + str(header_list[3]) + "))"
+        print("Model:",m," Tree topology: ",string)
         return string
     elif topology == 1:
         header_list = read_alignment_file(args.alignment_file)
-        string = "1.0 Model_" + m + "((" + str(header_list[0]) + "," + str(header_list[2]) + "),(" + str(header_list[1]) + "," + str(header_list[3]) + "))"
-        print(string)
+        string = "((" + str(header_list[0]) + "," + str(header_list[2]) + "),(" + str(header_list[1]) + "," + str(header_list[3]) + "))"
+        print("Model:",m," Tree topology: ",string)
         return string
     elif topology == 2:
         header_list = read_alignment_file(args.alignment_file)
-        string = "1.0 Model_" + str(m) + "((" + str(header_list[0]) + "," + str(header_list[3]) + "),(" + str(header_list[2]) + "," + str(header_list[1]) + "))"
-        print(string)
+        string = "((" + str(header_list[0]) + "," + str(header_list[3]) + "),(" + str(header_list[2]) + "," + str(header_list[1]) + "))"
+        print("Model:",m," Tree topology: ",string)
         return string
 
 def check_read_config():
@@ -141,15 +143,15 @@ x = argmax(prediction)
 print('The softmax values of topologies: ', prediction)
 y = x.item()
 tree = tree_topology(y,args.substitution_model)
-tree = Phylo.read(StringIO(tree), 'newick')
 temporary_str = args.alignment_file.replace(".fas","")
 neural_name = args.NN_name.replace("/","")
-Phylo.write(tree, "tree_topology_" + temporary_str + '_' + neural_name +".nwk", "newick")
 os.remove("out.npy")
-# out_file =  "tree_topology_" + temporary_str + '_' + neural_name +".nwk"
-# f = open(out_file, "w")
-# f.write(tree)
-# f.close()
+out_file =  "tree_topology_" + temporary_str + '_' + neural_name +".nwk"
+f = open(out_file, "w")
+f.write(tree)
+f.write("\n")
+f.close()
 
-
-
+# These lines will be needed when tree length prediction is introduced 
+# tree = Phylo.read(StringIO(tree), 'newick')
+# Phylo.write(tree, "tree_topology_" + temporary_str + '_' + neural_name +".nwk", "newick")
