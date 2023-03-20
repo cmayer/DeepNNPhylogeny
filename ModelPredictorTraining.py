@@ -23,7 +23,7 @@ from tensorboard.plugins.hparams import api as hp
 parser = argparse.ArgumentParser()
 parser.add_argument('-sequence_type', type=str, default='DNA',
                     help='Compulsory argument. Nucleotide or Amino acids data. Enter DNA for nucleotide sequences. Enter AA for amino acid sequences.', required=True)
-parser.add_argument('-neural_network', type=str, default='b1', choices=['b1','b2','b3','b10','u','cu','cud'],
+parser.add_argument('-neural_network', type=str, default='b1', choices=['b1','b2','b3','b10','u','cu'],
                     help='Optional argument. Which neural network should be trained. Default: b1', required=False)
 parser.add_argument('-seqlen', type=int, default=None,
                     help='Optional argument.The length of the training sequences. Default for DNA: 100000\tDefault for amino acids: 1000000',required=False)
@@ -1350,44 +1350,6 @@ def branched_model_cu(hparam, normlayer):
     return ann
 
 
-def branched_model_cud(hparam, normlayer):
-    input = tf.keras.Input(shape=(LEN,))
-    inputn = normlayer(input)
-    
-    x3 = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(inputn)
-    x4 = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x3)
-    x5 = tf.keras.layers.Dense(units=128, activation=hparam[HP_ACTIVATION])(x4)
-    x6d = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x5)
-    x7 = tf.keras.layers.Dense(units=64, activation=hparam[HP_ACTIVATION])(x6d)
-    x7d = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x7)
-    x8 = tf.keras.layers.Dense(units=64, activation=hparam[HP_ACTIVATION])(x7d)
-
-    y0 = tf.keras.layers.concatenate([x7, x8])
-
-    x9 = tf.keras.layers.Dense(units=128, activation=hparam[HP_ACTIVATION])(y0)
-
-    y1 = tf.keras.layers.concatenate([x5, x9])
-
-    x10 = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(y1)
-
-    y2 = tf.keras.layers.concatenate([x10, x3])
-
-    x11 = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(y2)
-    x14 = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x11)
-    x15 = tf.keras.layers.Dense(units=128, activation=hparam[HP_ACTIVATION])(x14)
-    x16 = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x15)
-    x17 = tf.keras.layers.Dense(units=64, activation=hparam[HP_ACTIVATION])(x16)
-    x19 = tf.keras.layers.Dense(units=16, activation=hparam[HP_ACTIVATION])(x17)
-    if args.sequence_type == 'DNA':
-        x20 = tf.keras.layers.Dense(units=5, activation='softmax')(x19)
-    elif args.sequence_type == 'AA':
-        x20 = tf.keras.layers.Dense(units=4, activation='softmax')(x19)
-
-    ann = tf.keras.Model(inputs=[input], outputs=x20)
-    optimizer = get_optimizer(hparam[HP_OPTIMIZER])
-    ann.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
-    return ann
-
 
 def run_hparam_one_model_one_hset(model_func, X_train, Y_train, X_test, Y_test, hparams, normlayer, do_probabilities=False):
     model = model_func(hparams, normlayer)
@@ -1474,11 +1436,7 @@ if args.neural_network == 'cu':
                        frequency_train, evo_mod_train,
                        frequency_test, evo_mod_test, normlayer
              )
-if args.neural_network == 'cud':
-    run_hparam_on_grid(branched_model_cud,
-                       frequency_train, evo_mod_train,
-                       frequency_test, evo_mod_test, normlayer
-        )
+
 
 sys.exit(0)
 
