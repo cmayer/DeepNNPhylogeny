@@ -31,7 +31,7 @@ parser.add_argument('-substitution_model',type=str, choices=['JC','K2P','F81','F
 parser.add_argument('-seqlen', type=int, default=None, help = "Optional argument. The length of the training sequences. Default for DNA: 100000\tDefault for amino acids: 1000000", required=False)
 parser.add_argument('-seqnum', type=int, default=None,
                     help = "Optional argument. The number of sequences used for training. Actual number is multiplied by 6. Default for DNA: 100000\tDefault for amino acids: 1000", required=False)
-parser.add_argument('-neural_network', type=str, default='b1', choices=['b1','b2','b3','b10','u','cu','cud'],
+parser.add_argument('-neural_network', type=str, default='b1', choices=['b1','b2','b3','b10','u','cu'],
                     help="Optional argument. Which neural network should be trained. Default: b1", required=False)
 parser.add_argument('-epochs', type=int, default=500,
                     help="Optional parameter. The number of epochs is a hyperparameter that defines the number times that the learning algorithm will work through the entire training dataset. Default: 500", required=False)
@@ -1332,41 +1332,6 @@ def branched_model_cu(hparam, normlayer):
     return ann
 
 
-def branched_model_cud(hparam, normlayer):
-    input = tf.keras.Input(shape=(LEN,))
-    inputn = normlayer(input)
-
-    x3 = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(inputn)
-    x4 = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x3)
-    x5 = tf.keras.layers.Dense(units=128, activation=hparam[HP_ACTIVATION])(x4)
-    x6d = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x5)
-    x7 = tf.keras.layers.Dense(units=64, activation=hparam[HP_ACTIVATION])(x6d)
-    x7d = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x7)
-    x8 = tf.keras.layers.Dense(units=64, activation=hparam[HP_ACTIVATION])(x7d)
-
-    y0 = tf.keras.layers.concatenate([x7, x8])
-
-    x9 = tf.keras.layers.Dense(units=128, activation=hparam[HP_ACTIVATION])(y0)
-
-    y1 = tf.keras.layers.concatenate([x5, x9])
-
-    x10 = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(y1)
-
-    y2 = tf.keras.layers.concatenate([x10, x3])
-
-    x11 = tf.keras.layers.Dense(units=256, activation=hparam[HP_ACTIVATION])(y2)
-    x14 = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x11)
-    x15 = tf.keras.layers.Dense(units=128, activation=hparam[HP_ACTIVATION])(x14)
-    x16 = tf.keras.layers.Dropout(hparam[HP_DROPOUT])(x15)
-    x17 = tf.keras.layers.Dense(units=64, activation=hparam[HP_ACTIVATION])(x16)
-    x19 = tf.keras.layers.Dense(units=16, activation=hparam[HP_ACTIVATION])(x17)
-    x20 = tf.keras.layers.Dense(units=3, activation="softmax")(x19)
-
-    ann = tf.keras.Model(inputs=[input], outputs=x20)
-    optimizer = get_optimizer(hparam[HP_OPTIMIZER])
-    ann.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
-    return ann
-
 
 def run_hparam_one_model_one_hset(model_func, X_train, Y_train, X_test, Y_test, hparams, normlayer, do_probabilities=False):
     model = model_func(hparams, normlayer)
@@ -1441,11 +1406,6 @@ elif args.neural_network == 'u':
             )
 elif args.neural_network == 'cu':
     run_hparam_on_grid(branched_model_cu,
-                       frequency_train, topology_train,
-                       frequency_test, topology_test, normlayer
-            )
-elif args.neural_network == 'cud':
-    run_hparam_on_grid(branched_model_cud,
                        frequency_train, topology_train,
                        frequency_test, topology_test, normlayer
             )
