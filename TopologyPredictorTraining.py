@@ -219,7 +219,7 @@ def find_frequency(freq_file):
         for line in frequency_file:
             column = line.split("\t")
             if len(column[0]) == 4:
-                frequency_list.append(column[1])
+                frequency_list.append(np.float32(column[1]))
             else :
                 f_e = open('file_error.txt', 'a')
                 f_e.write(line)
