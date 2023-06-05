@@ -35,7 +35,7 @@ make
 
 ## Training your own neural networks:
 
-Pre-trained neural networks can be downloaded from Dryad (link will be placed here soon). If you prefer to use pre-trained models, you can skip next section.<br>
+Pre-trained neural networks can be downloaded from [DryAd](https://doi.org/10.5061/dryad.ksn02v783). If you prefer to use pre-trained models, you can skip next section.<br>
 
 **You can train your own neural networks as follows:<br>**
 
@@ -76,11 +76,11 @@ For a large number of amino acid replicates, we recommend to use multiprocessing
 
 Topology and model predictions require the quartet-pattern-counter program to be in your system path or in the directory you run the python programs in.
 
-You can use pre-trained neural networks that can be downloaded from Dryad (link will be available soon) or you can train your own neural networks.
+You can use pre-trained neural networks that can be downloaded from [DryAd](https://doi.org/10.5061/dryad.ksn02v783) or you can train your own neural networks.
 
 ## Predicting models of sequence evolution for user specified alignments using pre-trained models: 
 
-Download pre-trained neural networks from [xxx](https://www.dryadcom) or use a model you have trained yourself.
+Download pre-trained neural networks from [DryAd](https://doi.org/10.5061/dryad.ksn02v783) or use a model you have trained yourself.
 The programs search for the neural network in the working directory, specified path to the neural network, or DeepNNPhylogeny.config file.
 Make sure that you have placed a DeepNNPhylogeny.config file in the working directory, the home directory, or the DeepNNPhylogeny-main folder placed in the home directory. 
 The default content of the DeepNNPhylogeny.config is the DryAD folders contained pre-trained NNs. 
