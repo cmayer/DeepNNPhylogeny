@@ -112,6 +112,12 @@ where (\*) is DNA or AA <br />
 (\*\*\*) is a name of the multiple-sequence-alignment file <br />
 After substitution model prediction it will ask you for an input. You should enter the name of the topology prediction NN.
 
+## How to cite DeepNNPhylogeny:
+Machine learning can be as good as maximum likelihood when reconstructing phylogenetic trees and determining the best evolutionary model on four taxon alignments
+
+https://www.biorxiv.org/content/10.1101/2023.07.12.548770v1.article-metrics
+
+
 
 ## Frequently asked questions <a id="Frequently-aksed-questions"></a>
 No questions have been asked so far.
