@@ -160,7 +160,7 @@ template<typename Scalar>
   } // namespace detail
 
 template<typename Scalar>
-  void SaveArrayAsNumpy(
+  void ArrayAsNumpy(
 			const std::string& filename, bool fortran_order,
 			int n_dims, const int shape[], const Scalar* data)
  {
@@ -182,13 +182,13 @@ template<typename Scalar>
      throw std::runtime_error("io error: failed to open a file.");
    }
    stream << preamble << header;
-   int size = 1;
+   size_t size = 1;
    for(int i=0; i<n_dims; ++i) { size *= shape[i]; }
    stream.write(reinterpret_cast<const char*>(data), sizeof(Scalar)*size);
  }
 
 template<typename Scalar>
-  void SaveArrayAsNumpy(
+  void ArrayAsNumpy(
 			const std::string& filename,
 			int n_dims, const int shape[], const Scalar* data)
  {
