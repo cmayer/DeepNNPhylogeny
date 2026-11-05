@@ -1,0 +1,9 @@
+Version 1.1: 
+In this version SaveArrayAsNumpy numpy.h had the wrong name. This bug is corrected in Version 1.1.1.
+After this bug has been fixed, it works if the sequences do not contain symbols other than the data type specific upper case residues.
+So also no gaps, Ns, or other ambiguity codes are allowed. Using them leads to wrong inferences.
+
+Version 1.1.1:
+- Fixes the name bug in numpy.h.
+- Converts lower case residues to upper case residues, depending on the data type.
+- Ignores sites with gaps, Ns, and any other symbols not in the alphabet DNA or AA alphabet, whichever is used.

@@ -2,7 +2,7 @@
 In this project we developed Deep Neural Networks for phylogenetic tree reconstruction and evolutionary model selection. Currently the networks are limited to quartet trees. On quartet trees the neural network classifiers perform in most cases as good as the maximum likelihood method, which means that it is not significantly better or worse than maximum likelihood.
 In very few scenarios the neural network is marginally but significantly inferior to the maximum likelihood method, but we think that neural networks and training can be improved such that both methods perform equally good.<br>
 
-This repository contains the software for training und using neural networks for the following tasks:
+This repository contains the software for training and using neural networks for the following tasks:
 - model prediction for nucleotide alignments
 - model prediction for amino acid alignments
 - topology prediction for nucleotide alignments
@@ -27,10 +27,11 @@ Next compile the quartet-pattern-counter-v1.1 program:
 ```
 cd DeepNNPhylogeny-main/
 chmod u+x ModelPred_TopPred.sh
-cd quartet-pattern-counter-v1.1_src/
+cd quartet-pattern-counter-v1.1.1_src/
 make
 # If "make" is not installed, type: chmod u+x compile.sh; ./compile.sh
 ```
+- Version 1.1.1 fixes version 1.1: sites with gaps, N or other ambiguity codes are skipped, lower case is counted as upper case, frequencies are relative to the number of counted sites, and the input is checked (exactly four sequences of equal length). Version 1.1 gave wrong frequencies for alignments with gaps, ambiguity codes or lower case letters. The program is still called quartet-pattern-counter-v1.1, so the Python scripts find it. Replace an older copy in your $PATH.
 - Make sure that you copy the compiled quartet-pattern-counter-v1.1 program to a folder that is listed in your $PATH variable so that your system can always find it, or copy it to the folder you want to use it from, or specify the full path to the program.
 
 ## Training your own neural networks:
