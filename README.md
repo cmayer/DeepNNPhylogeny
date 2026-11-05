@@ -31,7 +31,7 @@ cd quartet-pattern-counter-v1.1.1_src/
 make
 # If "make" is not installed, type: chmod u+x compile.sh; ./compile.sh
 ```
-- Version 1.1.1 fixes version 1.1: Name mismatch in numpy.h and quartet-pattern-counter.cpp was fixed. sites with gaps, N or other ambiguity codes are now skipped, lower case is counted as upper case, frequencies are relative to the number of counted sites, and the input file is checked that it has exactly four sequences of equal length. Version 1.1 gave wrong frequencies for alignments with gaps, ambiguity codes or lower case letters. The program is still called quartet-pattern-counter-v1.1, so the Python scripts find it. Replace an older copy in your $PATH.
+- Version 1.1.1 fixes version 1.1: Name mismatch in numpy.h and quartet-pattern-counter.cpp was fixed. Sites with gaps, N or other ambiguity codes are now skipped, lower case is counted as upper case, frequencies are relative to the number of counted sites, and the input file is checked that it has exactly four sequences of equal length. Version 1.1 gave wrong frequencies for alignments with gaps, ambiguity codes or lower case letters. The program is still called quartet-pattern-counter-v1.1, so the Python scripts find it. Replace an older copy in your $PATH.
 - Make sure that you copy the compiled quartet-pattern-counter-v1.1 program to a folder that is listed in your $PATH variable so that your system can always find it, or copy it to the folder you want to use it from, or specify the full path to the program.
 
 ## Training your own neural networks:
